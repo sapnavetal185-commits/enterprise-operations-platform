@@ -9,7 +9,7 @@ namespace EnterpriseOperations.Controllers;
 public class AirportsController : ControllerBase
 {
     private readonly TravelHubDbContext _context;
-
+ 
     public AirportsController(TravelHubDbContext context)
     {
         _context = context;
@@ -17,13 +17,41 @@ public class AirportsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAirports(
-        CancellationToken cancellationToken)
+           [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+                CancellationToken cancellationToken=default)
     {
+        // Validate pagination parameters
+        if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
+        {
+            return BadRequest(new
+            {
+                message = "Page number must be at least 1, and page size must be between 1 and 100."
+            });
+        }
+        // Count all airport records
+        var totalRecords = await _context.Airports
+            .CountAsync(cancellationToken);
+
+        // Fetch only the requested page
         var airports = await _context.Airports
             .AsNoTracking()
+            .OrderBy(a => a.AirportCode)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return Ok(airports);
+        var totalPages = (int)Math.Ceiling(
+            totalRecords / (double)pageSize);
+
+        return Ok(new
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = totalPages,
+            Data = airports
+        });
     }
     [HttpGet("{airportCode}")]
     public async Task<IActionResult> GetAirportByCode(
