@@ -24,11 +24,11 @@ builder.Services.AddDbContext<TravelHubIdentityDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("TravelHubAuthDb")));
 
-builder.Services
-    .AddIdentityCore<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<TravelHubIdentityDbContext>()
-    .AddSignInManager();
+//builder.Services
+//    .AddIdentityCore<IdentityUser>()
+//    .AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<TravelHubIdentityDbContext>()
+//    .AddSignInManager();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("api", limiter =>
