@@ -53,5 +53,9 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
-
+app.Run(async (context) => {
+    throw new Exception("some exception");
+    await context.Response.WriteAsync("Hello World");
+}
+    ); 
 app.Run();

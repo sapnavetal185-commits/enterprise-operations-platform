@@ -1,0 +1,142 @@
+<section class="travel-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">EXPLORE THE WORLD</p>
+      <h1>Find your next adventure</h1>
+      <p class="subtitle">
+        Discover amazing destinations and plan your next holiday.
+      </p>
+    </div>
+  </header>
+
+  <section class="filter-panel">
+    <div class="filter-field search-field">
+      <label for="search">Search destination</label>
+      <input
+        id="search"
+        type="search"
+        [(ngModel)]="searchText"
+        placeholder="Try Goa or Manali"
+      />
+    </div>
+
+    <div class="filter-field">
+      <label for="maxPrice">Maximum price (₹)</label>
+      <input
+        id="maxPrice"
+        type="number"
+        min="0"
+        [(ngModel)]="maxPrice"
+        placeholder="e.g. 20000"
+      />
+    </div>
+
+    <div class="filter-field">
+      <label for="minDuration">Minimum days</label>
+      <input
+        id="minDuration"
+        type="number"
+        min="1"
+        [(ngModel)]="minDuration"
+        placeholder="e.g. 3"
+      />
+    </div>
+
+    <div class="filter-field">
+      <label for="sortBy">Sort by</label>
+      <select id="sortBy" [(ngModel)]="sortBy">
+        <option value="name">Trip name</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+      </select>
+    </div>
+
+    <button class="clear-button" type="button" (click)="clearFilters()">
+      Clear filters
+    </button>
+  </section>
+
+  @if (isLoading) {
+    <div class="status-message" role="status">
+      <span class="spinner"></span>
+      <p>Loading amazing trips...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="status-message error-message" role="alert">
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="primary-button" (click)="loadTrips()">
+        Try again
+      </button>
+    </div>
+  } @else {
+    <div class="results-header">
+      <h2>Available trips</h2>
+      <span>{{ filteredTrips.length }} trips found</span>
+    </div>
+
+    @if (filteredTrips.length === 0) {
+      <div class="empty-state">
+        <h3>No trips found</h3>
+        <p>Try changing your search or filters.</p>
+        <button
+          type="button"
+          class="primary-button"
+          (click)="clearFilters()"
+        >
+          Show all trips
+        </button>
+      </div>
+    } @else {
+      <div class="travel-grid">
+        @for (trip of filteredTrips; track trip.id) {
+          <article class="travel-card">
+            @if (trip.imageUrl) {
+              <img
+                class="travel-image"
+                [src]="trip.imageUrl"
+                [alt]="trip.destination"
+                loading="lazy"
+              />
+            } @else {
+              <div class="image-placeholder">
+                <span>{{ trip.destination }}</span>
+              </div>
+            }
+
+            <div class="travel-content">
+              <p class="destination-label">
+                <span aria-hidden="true">📍</span>
+                {{ trip.destination }}
+              </p>
+
+              <h3>{{ trip.title }}</h3>
+
+              <p class="description">
+                {{ trip.description }}
+              </p>
+
+              <div class="trip-meta">
+                <span>🗓 {{ trip.durationDays }} days</span>
+              </div>
+
+              <div class="card-footer">
+                <div class="price">
+                  <span>Starting from</span>
+                  <strong>{{ trip.price | currency:'INR':'symbol':'1.0-0' }}</strong>
+                </div>
+
+                <button
+                  type="button"
+                  class="primary-button"
+                  (click)="viewTrip(trip.id)"
+                >
+                  View details
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>
